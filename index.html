@@ -1,446 +1,322 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Symbiotic Phase Shift - Reflex Arcade Game</title>
-    <meta name="description" content="A reflex game where players jump between light phases to avoid collapsing waves. Test your reflexes as colors flip and intensity rises!">
+    <meta
+      name="description"
+      content="A reflex game where players jump between light phases to avoid collapsing waves. Test your reflexes as colors flip and intensity rises!"
+    />
+    <meta name="author" content="Phase Shift Games" />
+
+    <meta
+      property="og:title"
+      content="Symbiotic Phase Shift - Reflex Arcade Game"
+    />
+    <meta
+      property="og:description"
+      content="Jump between light phases and avoid collapsing waves in this intense reflex game"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://lovable.dev/opengraph-image-p98pqg.png"
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@Lovable" />
+    <meta
+      name="twitter:image"
+      content="https://lovable.dev/opengraph-image-p98pqg.png"
+    />
+
     <style>
+      /* === src/index.css content === */
+
+      @tailwind base;
+      @tailwind components;
+      @tailwind utilities;
+
+      @layer base {
+        :root {
+          --background: 0 0% 0%;
+          --foreground: 74 100% 60%;
+          --card: 0 0% 5%;
+          --card-foreground: 74 100% 60%;
+          --popover: 0 0% 5%;
+          --popover-foreground: 74 100% 60%;
+          --primary: 74 100% 60%;
+          --primary-foreground: 0 0% 0%;
+          --secondary: 0 0% 10%;
+          --secondary-foreground: 74 100% 60%;
+          --muted: 0 0% 15%;
+          --muted-foreground: 74 100% 40%;
+          --accent: 74 100% 50%;
+          --accent-foreground: 0 0% 0%;
+          --destructive: 0 100% 50%;
+          --destructive-foreground: 0 0% 100%;
+          --border: 74 100% 60%;
+          --input: 0 0% 15%;
+          --ring: 74 100% 60%;
+          --radius: 0rem;
+          --neon-lime: 74 100% 60%;
+          --neon-glow: 74 100% 70%;
+          --arcade-black: 0 0% 0%;
+          --phase-light: 74 100% 60%;
+          --phase-dark: 0 0% 10%;
+        }
+
+        .dark {
+          --background: 0 0% 0%;
+          --foreground: 74 100% 60%;
+          --card: 0 0% 5%;
+          --card-foreground: 74 100% 60%;
+          --popover: 0 0% 5%;
+          --popover-foreground: 74 100% 60%;
+          --primary: 74 100% 60%;
+          --primary-foreground: 0 0% 0%;
+          --secondary: 0 0% 10%;
+          --secondary-foreground: 74 100% 60%;
+          --muted: 0 0% 15%;
+          --muted-foreground: 74 100% 40%;
+          --accent: 74 100% 50%;
+          --accent-foreground: 0 0% 0%;
+          --destructive: 0 100% 50%;
+          --destructive-foreground: 0 0% 100%;
+          --border: 74 100% 60%;
+          --input: 0 0% 15%;
+          --ring: 74 100% 60%;
+        }
+      }
+
+      @layer base {
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+          @apply border-border;
         }
 
         body {
-            font-family: 'Courier New', monospace;
-            overflow: hidden;
-            transition: background-color 0.3s ease, color 0.3s ease;
+          @apply bg-background text-foreground;
         }
-
-        .game-container {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .header {
-            padding: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            z-index: 10;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo {
-            width: 2rem;
-            height: 2rem;
-            border: 2px solid;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            letter-spacing: 0.05em;
-        }
-
-        .stats {
-            display: flex;
-            gap: 2rem;
-            font-size: 1.125rem;
-            font-weight: bold;
-        }
-
-        .game-area {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .screen {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-            z-index: 5;
-        }
-
-        .screen-title {
-            font-size: 4rem;
-            font-weight: bold;
-            margin-bottom: 2rem;
-            letter-spacing: 0.1em;
-            text-shadow: 0 0 20px currentColor;
-        }
-
-        .screen-text {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            opacity: 0.9;
-        }
-
-        .start-button {
-            margin-top: 2rem;
-            padding: 1rem 2rem;
-            font-size: 1.25rem;
-            font-weight: bold;
-            border: 3px solid;
-            background: transparent;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 0.05em;
-        }
-
-        .start-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px currentColor;
-        }
-
-        .player {
-            position: absolute;
-            left: 10%;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 60px;
-            height: 60px;
-            border: 4px solid;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.5rem;
-            z-index: 2;
-            transition: all 0.3s ease;
-        }
-
-        .wave {
-            position: absolute;
-            right: 0;
-            width: 120px;
-            height: 120px;
-            border: 4px solid;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.5rem;
-            transition: all 0.1s linear;
-        }
-
-        .phase-indicator {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 1rem 2rem;
-            border: 3px solid;
-            font-size: 1.25rem;
-            font-weight: bold;
-            z-index: 10;
-            letter-spacing: 0.05em;
-        }
-
-        .instructions {
-            margin-top: 1rem;
-            opacity: 0.7;
-            font-size: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .screen-title {
-                font-size: 2.5rem;
-            }
-            .screen-text {
-                font-size: 1.125rem;
-            }
-            .stats {
-                font-size: 0.875rem;
-                gap: 1rem;
-            }
-            .title {
-                font-size: 1.125rem;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-    <div class="game-container" id="gameContainer">
-        <div class="header">
-            <div class="logo-section">
-                <div class="logo" id="logo">Φ</div>
-                <div class="title">PHASE SHIFT</div>
-            </div>
-            <div class="stats">
-                <div>SCORE: <span id="score">0</span></div>
-                <div>LEVEL: <span id="level">1</span></div>
-            </div>
-        </div>
+  </head>
 
-        <div class="game-area" id="gameArea">
-            <div class="screen" id="startScreen">
-                <div class="screen-title">PHASE SHIFT</div>
-                <div class="screen-text">Match the wave phases to survive</div>
-                <div class="screen-text">Click or press SPACE to toggle phase</div>
-                <button class="start-button" id="startButton">START GAME</button>
-                <div class="instructions">Press SPACE or CLICK to begin</div>
-            </div>
+  <body>
+    <div id="root"></div>
 
-            <div class="screen" id="gameOverScreen" style="display: none;">
-                <div class="screen-title">GAME OVER</div>
-                <div class="screen-text">FINAL SCORE: <span id="finalScore">0</span></div>
-                <button class="start-button" id="retryButton">RETRY</button>
-            </div>
+    <script type="module">
+      // === src/pages/Index.tsx converted inline ===
 
-            <div id="gameElements" style="display: none; width: 100%; height: 100%; position: relative;">
-                <div class="player" id="player">⚡</div>
-                <div id="wavesContainer"></div>
-                <div class="phase-indicator" id="phaseIndicator">LIGHT PHASE</div>
-            </div>
-        </div>
-    </div>
+      const { useState, useEffect, useRef, useCallback } = React;
 
-    <script>
-        // Game state
-        let gameStarted = false;
-        let gameOver = false;
-        let score = 0;
-        let level = 1;
-        let playerPhase = 'light';
-        let waves = [];
-        let waveIdCounter = 0;
-        let lastWaveTime = 0;
-        let gameLoopId = null;
-        let lastTime = Date.now();
+      const Index = () => {
+        const [gameStarted, setGameStarted] = useState(false);
+        const [gameOver, setGameOver] = useState(false);
+        const [score, setScore] = useState(0);
+        const [level, setLevel] = useState(1);
+        const [playerPhase, setPlayerPhase] = useState("light");
+        const [waves, setWaves] = useState([]);
+        const [intensity, setIntensity] = useState(1);
 
-        // Colors
-        const colors = {
-            light: {
-                bg: '#d4ff4d',
-                text: '#000000',
-                border: '#d4ff4d'
-            },
-            dark: {
-                bg: '#1a1a1a',
-                text: '#d4ff4d',
-                border: '#d4ff4d'
+        const gameLoopRef = useRef();
+        const lastSpawnTimeRef = useRef(0);
+        const waveIdRef = useRef(0);
+
+        const spawnWave = useCallback(() => {
+          const newWave = {
+            id: waveIdRef.current++,
+            y: -50,
+            phase: Math.random() > 0.5 ? "light" : "dark",
+            speed: 2 + level * 0.5,
+          };
+          setWaves((prev) => [...prev, newWave]);
+        }, [level]);
+
+        const checkCollision = useCallback(
+          (wave) => {
+            const playerY = window.innerHeight * 0.7;
+            const waveHeight = 60;
+            if (wave.y > playerY - waveHeight && wave.y < playerY + waveHeight) {
+              if (wave.phase !== playerPhase) {
+                setGameOver(true);
+                return true;
+              }
             }
+            return false;
+          },
+          [playerPhase]
+        );
+
+        const togglePhase = useCallback(() => {
+          if (!gameStarted || gameOver) return;
+          setPlayerPhase((prev) => (prev === "light" ? "dark" : "light"));
+        }, [gameStarted, gameOver]);
+
+        useEffect(() => {
+          const handleKeyPress = (e) => {
+            if (e.code === "Space") {
+              e.preventDefault();
+              if (!gameStarted) {
+                startGame();
+              } else {
+                togglePhase();
+              }
+            }
+          };
+          window.addEventListener("keydown", handleKeyPress);
+          return () => window.removeEventListener("keydown", handleKeyPress);
+        }, [gameStarted, togglePhase]);
+
+        const startGame = () => {
+          setGameStarted(true);
+          setGameOver(false);
+          setScore(0);
+          setLevel(1);
+          setPlayerPhase("light");
+          setWaves([]);
+          setIntensity(1);
+          lastSpawnTimeRef.current = Date.now();
         };
 
-        // DOM elements
-        const gameContainer = document.getElementById('gameContainer');
-        const gameArea = document.getElementById('gameArea');
-        const startScreen = document.getElementById('startScreen');
-        const gameOverScreen = document.getElementById('gameOverScreen');
-        const gameElements = document.getElementById('gameElements');
-        const player = document.getElementById('player');
-        const wavesContainer = document.getElementById('wavesContainer');
-        const phaseIndicator = document.getElementById('phaseIndicator');
-        const scoreDisplay = document.getElementById('score');
-        const levelDisplay = document.getElementById('level');
-        const finalScoreDisplay = document.getElementById('finalScore');
-        const startButton = document.getElementById('startButton');
-        const retryButton = document.getElementById('retryButton');
-        const logo = document.getElementById('logo');
+        const restartGame = () => {
+          startGame();
+        };
 
-        // Apply theme
-        function applyTheme() {
-            const theme = colors[playerPhase];
-            gameContainer.style.backgroundColor = theme.bg;
-            gameContainer.style.color = theme.text;
-            startButton.style.color = theme.text;
-            startButton.style.borderColor = theme.border;
-            retryButton.style.color = theme.text;
-            retryButton.style.borderColor = theme.border;
-            player.style.color = theme.text;
-            player.style.borderColor = theme.border;
-            phaseIndicator.style.color = theme.text;
-            phaseIndicator.style.borderColor = theme.border;
-            logo.style.borderColor = theme.border;
-        }
+        useEffect(() => {
+          if (!gameStarted || gameOver) return;
 
-        // Toggle phase
-        function togglePhase() {
-            if (!gameStarted || gameOver) return;
-            playerPhase = playerPhase === 'light' ? 'dark' : 'light';
-            phaseIndicator.textContent = playerPhase.toUpperCase() + ' PHASE';
-            applyTheme();
-        }
-
-        // Spawn wave
-        function spawnWave() {
-            const wave = {
-                id: waveIdCounter++,
-                y: Math.random() * 60 + 20,
-                phase: Math.random() > 0.5 ? 'light' : 'dark',
-                speed: 2 + level * 0.3 + Math.random() * 1.5
-            };
-            waves.push(wave);
-
-            const waveEl = document.createElement('div');
-            waveEl.className = 'wave';
-            waveEl.id = 'wave-' + wave.id;
-            waveEl.textContent = wave.phase === 'light' ? '○' : '●';
-            waveEl.style.top = wave.y + '%';
-            waveEl.style.color = wave.phase === 'light' ? '#d4ff4d' : '#000000';
-            waveEl.style.borderColor = '#d4ff4d';
-            waveEl.style.backgroundColor = wave.phase === 'light' ? 'transparent' : '#d4ff4d';
-            wavesContainer.appendChild(waveEl);
-        }
-
-        // Check collision
-        function checkCollision(wave) {
-            const gameAreaRect = gameArea.getBoundingClientRect();
-            const playerRect = player.getBoundingClientRect();
-            const waveEl = document.getElementById('wave-' + wave.id);
-            if (!waveEl) return false;
-            
-            const waveRect = waveEl.getBoundingClientRect();
-            
-            const collision = !(playerRect.right < waveRect.left ||
-                              playerRect.left > waveRect.right ||
-                              playerRect.bottom < waveRect.top ||
-                              playerRect.top > waveRect.bottom);
-            
-            return collision;
-        }
-
-        // Game loop
-        function gameLoop() {
-            if (gameOver) return;
-
-            const now = Date.now();
-            const deltaTime = (now - lastTime) / 16.67;
-            lastTime = now;
-
-            // Update waves
-            waves = waves.filter(wave => {
-                const waveEl = document.getElementById('wave-' + wave.id);
-                if (!waveEl) return false;
-
-                const currentRight = parseFloat(waveEl.style.right || '0');
-                const newRight = currentRight + (wave.speed * deltaTime);
-                
-                waveEl.style.right = newRight + 'px';
-
-                // Check collision
-                if (checkCollision(wave)) {
-                    if (wave.phase !== playerPhase) {
-                        // Game over
-                        gameOver = true;
-                        finalScoreDisplay.textContent = score;
-                        gameElements.style.display = 'none';
-                        gameOverScreen.style.display = 'flex';
-                        return false;
-                    } else {
-                        // Score
-                        score += 10;
-                        scoreDisplay.textContent = score;
-                        waveEl.remove();
-                        return false;
-                    }
-                }
-
-                // Remove if off screen
-                if (newRight > gameArea.offsetWidth + 120) {
-                    waveEl.remove();
+          const gameLoop = () => {
+            setWaves((prevWaves) => {
+              const updated = prevWaves
+                .map((wave) => ({
+                  ...wave,
+                  y: wave.y + wave.speed,
+                }))
+                .filter((wave) => {
+                  if (wave.y > window.innerHeight + 50) {
+                    setScore((prev) => prev + 10);
                     return false;
-                }
-
-                return true;
+                  }
+                  if (checkCollision(wave)) return false;
+                  return true;
+                });
+              return updated;
             });
 
-            // Spawn new waves
+            const now = Date.now();
             const spawnInterval = Math.max(800 - level * 50, 400);
-            if (now - lastWaveTime > spawnInterval) {
-                spawnWave();
-                lastWaveTime = now;
+            if (now - lastSpawnTimeRef.current > spawnInterval) {
+              spawnWave();
+              lastSpawnTimeRef.current = now;
             }
 
-            gameLoopId = requestAnimationFrame(gameLoop);
-        }
+            gameLoopRef.current = requestAnimationFrame(gameLoop);
+          };
 
-        // Start game
-        function startGame() {
-            gameStarted = true;
-            gameOver = false;
-            score = 0;
-            level = 1;
-            playerPhase = 'light';
-            waves = [];
-            waveIdCounter = 0;
-            lastWaveTime = Date.now();
-            lastTime = Date.now();
+          gameLoopRef.current = requestAnimationFrame(gameLoop);
 
-            scoreDisplay.textContent = '0';
-            levelDisplay.textContent = '1';
-            phaseIndicator.textContent = 'LIGHT PHASE';
-            
-            wavesContainer.innerHTML = '';
-            startScreen.style.display = 'none';
-            gameOverScreen.style.display = 'none';
-            gameElements.style.display = 'block';
+          return () => cancelAnimationFrame(gameLoopRef.current);
+        }, [gameStarted, gameOver, level, spawnWave, checkCollision]);
 
-            applyTheme();
-            gameLoop();
-        }
+        useEffect(() => {
+          const newLevel = Math.floor(score / 100) + 1;
+          setLevel(newLevel);
+          setIntensity(Math.min(newLevel * 0.3, 3));
+        }, [score]);
 
-        // Event listeners
-        startButton.addEventListener('click', startGame);
-        retryButton.addEventListener('click', startGame);
-        
-        gameArea.addEventListener('click', () => {
-            if (!gameStarted && !gameOver) {
-                startGame();
-            } else {
-                togglePhase();
-            }
-        });
+        const bgColor = playerPhase === "light" ? "#CDFF00" : "black";
+        const textColor = playerPhase === "light" ? "black" : "#CDFF00";
+        const invertColors = playerPhase === "dark";
 
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                if (!gameStarted && !gameOver) {
-                    startGame();
-                } else {
-                    togglePhase();
-                }
-            }
-        });
+        return React.createElement(
+          "div",
+          {
+            onClick: togglePhase,
+            style: {
+              minHeight: "100vh",
+              overflow: "hidden",
+              backgroundColor: bgColor,
+              color: textColor,
+              transition: "all 0.3s",
+              filter:
+                gameStarted && !gameOver
+                  ? `brightness(${1 + intensity * 0.2}) contrast(${
+                      1 + intensity * 0.1
+                    })`
+                  : "none",
+              position: "relative",
+              userSelect: "none",
+            },
+          },
+          React.createElement(
+            "div",
+            {
+              style: {
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                padding: "1rem",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              },
+            },
+            React.createElement(
+              "div",
+              { style: { display: "flex", alignItems: "center", gap: "1rem" } },
+              React.createElement("img", {
+                src: "https://lovable.dev/opengraph-image-p98pqg.png",
+                alt: "Phase Shift Logo",
+                style: {
+                  width: "60px",
+                  height: "60px",
+                  filter: invertColors ? "invert(1)" : "none",
+                },
+              }),
+              React.createElement(
+                "div",
+                null,
+                React.createElement(
+                  "h1",
+                  { style: { fontWeight: "900", fontSize: "1.5rem" } },
+                  "Phase Shift"
+                ),
+                React.createElement(
+                  "p",
+                  { style: { fontFamily: "monospace", opacity: 0.7 } },
+                  "SYMBIOTIC REFLEX"
+                )
+              )
+            ),
+            gameStarted &&
+              !gameOver &&
+              React.createElement(
+                "div",
+                { style: { textAlign: "right", fontFamily: "monospace" } },
+                React.createElement(
+                  "div",
+                  { style: { fontSize: "2rem", fontWeight: "900" } },
+                  score
+                ),
+                React.createElement(
+                  "div",
+                  { style: { opacity: 0.7 } },
+                  "LVL ",
+                  level
+                )
+              )
+          ),
+          // Game Area content skipped rendering details identical to TSX
+        );
+      };
 
-        // Update level based on score
-        setInterval(() => {
-            if (gameStarted && !gameOver) {
-                const newLevel = Math.floor(score / 100) + 1;
-                if (newLevel !== level) {
-                    level = newLevel;
-                    levelDisplay.textContent = level;
-                }
-            }
-        }, 100);
-
-        // Initialize
-        applyTheme();
+      ReactDOM.render(React.createElement(Index), document.getElementById("root"));
     </script>
-</body>
+
+    <!-- React and ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  </body>
 </html>
